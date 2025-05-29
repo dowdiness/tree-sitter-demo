@@ -43,7 +43,7 @@ tree-sitter generate
 
 ## Usage
 
-### Parse Calculator Expressions
+### Command Line
 
 ```bash
 # Parse a single expression
@@ -52,6 +52,57 @@ echo "2 + 3 * 4" | tree-sitter parse
 # Parse from file
 tree-sitter parse test.calc
 ```
+
+### TypeScript/JavaScript
+
+First install the required dependencies:
+
+```bash
+npm install tree-sitter @types/node typescript ts-node
+```
+
+Then use the parser in your TypeScript code:
+
+```typescript
+import Parser from 'tree-sitter';
+import Calculator from './bindings/node';
+
+// Initialize parser
+const parser = new Parser();
+parser.setLanguage(Calculator);
+
+// Parse expression
+const tree = parser.parse('2 + 3 * 4');
+console.log(tree.rootNode.toString());
+
+// Evaluate expression
+function evaluate(node: Parser.SyntaxNode): number {
+  switch (node.type) {
+    case 'number':
+      return parseFloat(node.text);
+    case 'binary_expression':
+      const left = evaluate(node.children[0]);
+      const operator = node.children[1].text;
+      const right = evaluate(node.children[2]);
+      
+      switch (operator) {
+        case '+': return left + right;
+        case '-': return left - right;
+        case '*': return left * right;
+        case '/': return left / right;
+        case '%': return left % right;
+      }
+    // ... handle other node types
+  }
+}
+```
+
+**Run the example:**
+```bash
+npm run example
+```
+
+See `example-usage.ts` for complete usage examples including AST traversal, validation, and expression evaluation.
 
 ### Example Parse Trees
 
